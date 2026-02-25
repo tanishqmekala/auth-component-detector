@@ -47,14 +47,9 @@ DEFAULT_SITES = [
 ]
 
 
-def fetch_html(url, timeout=15):
-    import os
+def fetch_html(url, timeout=30):
+    import os, glob
     from playwright.sync_api import sync_playwright
-
-    # On Railway/Linux, use the system-installed Chromium
-    # On local Mac/Windows, Playwright uses its own downloaded browser
-    system_chromium = '/usr/bin/chromium'
-    use_system = os.path.exists(system_chromium)
 
     with sync_playwright() as p:
         launch_kwargs = {
@@ -66,25 +61,54 @@ def fetch_html(url, timeout=15):
                 '--disable-gpu',
                 '--no-first-run',
                 '--no-zygote',
-                '--single-process',
                 '--disable-extensions',
+                '--disable-blink-features=AutomationControlled',
             ]
         }
-        if use_system:
-            launch_kwargs['executable_path'] = system_chromium
+
+        # Auto-find Chromium executable wherever it is installed
+        search_paths = [
+            '/usr/bin/chromium',
+            '/usr/bin/chromium-browser',
+            '/usr/bin/google-chrome',
+        ]
+        # Also search playwright's own downloaded browsers
+        pw_paths = glob.glob('/ms-playwright/chromium-*/chrome-linux/chrome')
+        pw_paths += glob.glob('/root/.cache/ms-playwright/chromium-*/chrome-linux/chrome')
+        pw_paths += glob.glob('/app/.venv/lib/python*/site-packages/playwright/driver/package/.local-browsers/chromium-*/chrome-linux/chrome')
+        pw_paths += glob.glob('/app/.venv/lib/python*/site-packages/playwright/driver/package/.local-browsers/chromium_headless_shell-*/chrome-headless-shell-linux64/chrome-headless-shell')
+
+        all_paths = search_paths + pw_paths
+        for path in all_paths:
+            if os.path.exists(path):
+                launch_kwargs['executable_path'] = path
+                break
 
         browser = p.chromium.launch(**launch_kwargs)
         context = browser.new_context(
-            user_agent='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
             viewport={'width': 1280, 'height': 800},
             locale='en-US',
         )
         page = context.new_page()
-        page.goto(url, wait_until='load', timeout=timeout * 1000)
-        page.wait_for_timeout(2000)
+        page.goto(url, wait_until='domcontentloaded', timeout=timeout * 1000)
+        page.wait_for_timeout(3000)
         html = page.content()
         browser.close()
     return html, 200
+```
+
+## Commit message:
+```
+fix chromium path auto-detection
+```
+
+Click **Commit changes** → Railway auto-redeploys in 3 minutes. 🚀
+
+Also go to Railway **Variables → Raw Editor** and change it back to just:
+```
+PYTHONUNBUFFERED=1
+PORT=8080
 
 
 def check_attr_match(tag, keywords):
