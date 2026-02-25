@@ -103,7 +103,6 @@ def fetch_html(url, timeout=30):
 fix chromium path auto-detection
 ```
 
-Also go to Railway **Variables → Raw Editor** and change it back to just:
 ```
 PYTHONUNBUFFERED=1
 PORT=8080
