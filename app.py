@@ -43,7 +43,7 @@ DEFAULT_SITES = [
     'https://www.linkedin.com/login',
     'https://www.facebook.com/login',
     'https://login.salesforce.com/',
-    'https://stackoverflow.com/users/login',
+    'https://login.twitter.com/i/flow/login',
 ]
 
 
@@ -440,7 +440,7 @@ footer a:hover{opacity:1;text-shadow:0 0 12px var(--red-glow);}
       <span class="chip" onclick="quick('https://www.linkedin.com/login')">LinkedIn</span>
       <span class="chip" onclick="quick('https://www.facebook.com/login')">Facebook</span>
       <span class="chip" onclick="quick('https://login.salesforce.com/')">Salesforce</span>
-      <span class="chip" onclick="quick('https://stackoverflow.com/users/login')">StackOverflow</span>
+      <span class="chip" onclick="quick('https://login.twitter.com/i/flow/login',)">Twitter</span>
     </div>
   </div>
 
