@@ -103,8 +103,6 @@ def fetch_html(url, timeout=30):
 fix chromium path auto-detection
 ```
 
-Click **Commit changes** → Railway auto-redeploys in 3 minutes. 🚀
-
 Also go to Railway **Variables → Raw Editor** and change it back to just:
 ```
 PYTHONUNBUFFERED=1
