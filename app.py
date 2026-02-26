@@ -96,18 +96,7 @@ def fetch_html(url, timeout=30):
         html = page.content()
         browser.close()
     return html, 200
-```
-
-## Commit message:
-```
-fix chromium path auto-detection
-```
-
-```
-PYTHONUNBUFFERED=1
-PORT=8080
-
-
+    
 def check_attr_match(tag, keywords):
     attrs_to_check = ['id', 'class', 'name', 'action', 'aria-label',
                       'placeholder', 'data-testid', 'role', 'for', 'type']
