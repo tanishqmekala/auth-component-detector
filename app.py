@@ -19,11 +19,6 @@ import time
 
 app = Flask(__name__)
 
-
-# ============================================================
-#  AUTH DETECTION ENGINE
-# ============================================================
-
 AUTH_KEYWORDS = [
     'login', 'log-in', 'log_in', 'signin', 'sign-in', 'sign_in',
     'auth', 'authenticate', 'credentials', 'sso', 'oauth',
