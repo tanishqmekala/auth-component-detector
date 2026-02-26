@@ -48,53 +48,30 @@ DEFAULT_SITES = [
 
 
 def fetch_html(url, timeout=30):
-    import os, glob
     from playwright.sync_api import sync_playwright
 
     with sync_playwright() as p:
-        launch_kwargs = {
-            'headless': True,
-            'args': [
+        browser = p.chromium.launch(
+            headless=True,
+            args=[
                 '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-dev-shm-usage',
-                '--disable-gpu',
-                '--no-first-run',
-                '--no-zygote',
-                '--disable-extensions',
-                '--disable-blink-features=AutomationControlled',
+                '--disable-dev-shm-usage'
             ]
-        }
+        )
 
-        # Auto-find Chromium executable wherever it is installed
-        search_paths = [
-            '/usr/bin/chromium',
-            '/usr/bin/chromium-browser',
-            '/usr/bin/google-chrome',
-        ]
-        # Also search playwright's own downloaded browsers
-        pw_paths = glob.glob('/ms-playwright/chromium-*/chrome-linux/chrome')
-        pw_paths += glob.glob('/root/.cache/ms-playwright/chromium-*/chrome-linux/chrome')
-        pw_paths += glob.glob('/app/.venv/lib/python*/site-packages/playwright/driver/package/.local-browsers/chromium-*/chrome-linux/chrome')
-        pw_paths += glob.glob('/app/.venv/lib/python*/site-packages/playwright/driver/package/.local-browsers/chromium_headless_shell-*/chrome-headless-shell-linux64/chrome-headless-shell')
-
-        all_paths = search_paths + pw_paths
-        for path in all_paths:
-            if os.path.exists(path):
-                launch_kwargs['executable_path'] = path
-                break
-
-        browser = p.chromium.launch(**launch_kwargs)
         context = browser.new_context(
             user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
             viewport={'width': 1280, 'height': 800},
             locale='en-US',
         )
+
         page = context.new_page()
         page.goto(url, wait_until='domcontentloaded', timeout=timeout * 1000)
         page.wait_for_timeout(3000)
+
         html = page.content()
         browser.close()
+
     return html, 200
     
 def check_attr_match(tag, keywords):
